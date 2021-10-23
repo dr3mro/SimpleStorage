@@ -4,6 +4,8 @@
 
 #include <QMainWindow>
 #include <QSqlRecord>
+#include <QSqlQuery>
+
 
 #include "custommodel.h"
 
@@ -25,13 +27,17 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    CustomModel *model;
     QSqlDatabase db;
+    QSqlQuery *query;
+    CustomModel *model;
 
+    QString getFilterString()const;
 
 private slots:
     void AddNewItemToTable();
     void DelNewItemToTable();
+    void Refresh();
+    void Filter();
 
 };
 #endif // MAINWINDOW_H
