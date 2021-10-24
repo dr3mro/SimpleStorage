@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     CustomModel.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    switch.cpp
 
 HEADERS += \
     CustomModel.h \
-    mainwindow.h
+    mainwindow.h \
+    switch.h
 
 FORMS += \
     mainwindow.ui
