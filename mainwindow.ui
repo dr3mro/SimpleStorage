@@ -98,7 +98,7 @@
     <item row="4" column="0">
      <widget class="QPushButton" name="resetDate_button">
       <property name="text">
-       <string>reset</string>
+       <string>set Today</string>
       </property>
      </widget>
     </item>
