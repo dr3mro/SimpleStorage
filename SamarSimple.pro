@@ -2,6 +2,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql
 
+RC_ICONS = appico.ico
+
 CONFIG += c++11
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -34,7 +36,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    SamarSimple_ar_EG.ts
+    SamarSimple_ar_EG.ts \
+    appico.ico
 
 RESOURCES += \
     resources.qrc
