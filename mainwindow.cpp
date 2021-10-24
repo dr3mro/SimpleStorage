@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     connectSignals();
     setlocales();
     setupModel();
+    Filter();
 
 }
 
@@ -45,16 +46,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::AddNewItemToTable()
 {
-
-    int rowsCount = model->rowCount();
-
-    QSqlRecord record = model->record(-1);
+    int rows = model->rowCount();
+    QSqlRecord record = model->record(rows);
     record.setValue("Item","");
     record.setValue("SellPrice",double(0));
     record.setValue("Timestamp",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss" ));
-    model->insertRecord(-1,record);
+    model->insertRecord(rows-1,record);
     model->select();
-    ui->tableView->selectRow(rowsCount);
+
+    ui->tableView->setFocus(Qt::FocusReason::OtherFocusReason);
+    ui->tableView->scrollToBottom();
+    ui->tableView->selectRow(rows);
+
+//    QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
+//    QModelIndex index = model->index(rows, 1);
+//    ui->tableView->selectionModel()->select(index,flags);
 }
 
 void MainWindow::DelNewItemToTable()
@@ -83,6 +89,7 @@ void MainWindow::Refresh()
 void MainWindow::Filter()
 {
     model->setFilter(getFilterString());
+    model->select();
     calculate();
 }
 
