@@ -26,12 +26,13 @@ MainWindow::MainWindow(QWidget *parent)
     setMonths();
     updateDaysOfMonth();
     ResetDate();
-    setupModel();
+
 
     calculate();
     resizeTableColumn();
     connectSignals();
     setlocales();
+    setupModel();
 
 }
 
@@ -108,6 +109,7 @@ void MainWindow::TranslateApp(int index)
         //:/i18n/SamarSimple_ar_EG.ts
         qApp->installTranslator(&translator);
         ui->retranslateUi(this);
+
         if(ilocales[index].Lang != "عربي"){
             setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         }else{
@@ -188,6 +190,9 @@ void MainWindow::connectSignals()
     connect(ui->resetDate_button,&QPushButton::clicked,this,&::MainWindow::ResetDate);
     connect(ui->tableView,&QTableView::pressed,this,&::MainWindow::ToggleDelButton);
     connect(ui->setLang,static_cast<void(QComboBox::*)(int)> (&QComboBox::currentIndexChanged),this,&::MainWindow::TranslateApp);
+    connect(ui->info_button,&QToolButton::clicked,this,[=](){
+        QMessageBox::information(this,tr("About"),tr("This app is being developed by Dr. Amr Osman"));
+    });
 }
 
 void MainWindow::setupDatabase()
@@ -261,7 +266,7 @@ void MainWindow::setupModel()
 {
     model->setTable("Sellings");
     model->setHeaderData(0, Qt::Orientation::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Orientation::Horizontal, tr("Name"));
+    model->setHeaderData(1, Qt::Orientation::Horizontal, tr("Item"));
     model->setHeaderData(2, Qt::Orientation::Horizontal, tr("Price"));
     model->setHeaderData(3, Qt::Orientation::Horizontal, tr("Date Time"));
     model->setEditStrategy(QSqlTableModel::OnRowChange);
@@ -279,7 +284,7 @@ void MainWindow::setupModel()
 void MainWindow::setlocales()
 {
 
-    for(int i=0;i< sizeof(ilocales) / sizeof(ilocales[0]) ;i++){
+    for(uint i=0;i< sizeof(ilocales) / sizeof(ilocales[0]) ;i++){
         ui->setLang->insertItem(i,ilocales[i].Lang);
     }
     ui->setLang->setCurrentIndex(currentLocale);

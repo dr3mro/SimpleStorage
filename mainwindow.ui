@@ -15,12 +15,39 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="4" column="0">
-     <widget class="QPushButton" name="resetDate_button">
-      <property name="text">
-       <string>reset</string>
-      </property>
-     </widget>
+    <item row="2" column="0" rowspan="2">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QComboBox" name="day"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Day</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="month"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="year"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Month</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Year</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item row="2" column="2">
      <widget class="QLineEdit" name="filter"/>
@@ -29,6 +56,13 @@
      <widget class="QLabel" name="label_4">
       <property name="text">
        <string>Search</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QComboBox" name="setLang">
+      <property name="currentText">
+       <string/>
       </property>
      </widget>
     </item>
@@ -45,6 +79,29 @@
       </property>
      </spacer>
     </item>
+    <item row="3" column="1" rowspan="5" colspan="4">
+     <widget class="QTableView" name="tableView">
+      <property name="editTriggers">
+       <set>QAbstractItemView::AllEditTriggers</set>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QPushButton" name="resetDate_button">
+      <property name="text">
+       <string>reset</string>
+      </property>
+     </widget>
+    </item>
     <item row="6" column="0">
      <widget class="QLabel" name="sum">
       <property name="font">
@@ -57,7 +114,7 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="0" colspan="3">
+    <item row="8" column="0" colspan="5">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -120,64 +177,33 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </item>
-    <item row="2" column="0" rowspan="2">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QComboBox" name="day"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Day</string>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="month"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="year"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Month</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
+      <item>
+       <widget class="QToolButton" name="info_button">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Year</string>
+         <string>ⓘ</string>
         </property>
        </widget>
       </item>
      </layout>
-    </item>
-    <item row="2" column="3">
-     <widget class="QComboBox" name="setLang">
-      <property name="currentText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1" rowspan="5" colspan="3">
-     <widget class="QTableView" name="tableView">
-      <property name="editTriggers">
-       <set>QAbstractItemView::AllEditTriggers</set>
-      </property>
-      <property name="alternatingRowColors">
-       <bool>true</bool>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectRows</enum>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>

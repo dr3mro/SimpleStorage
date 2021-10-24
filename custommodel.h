@@ -6,6 +6,7 @@
 #define SERVICEMODEL_H
 
 #include <QObject>
+#include <QEvent>
 #include <QtSql/QSqlTableModel>
 
 
@@ -14,6 +15,9 @@ class CustomModel : public QSqlTableModel
 public:
     explicit CustomModel(QObject *parent = Q_NULLPTR, QSqlDatabase db = QSqlDatabase());
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+protected:
+
 };
 
 #endif // SERVICEMODEL_H
