@@ -8,13 +8,16 @@
 #include <QSqlError>
 #include <QTableView>
 #include <QCalendar>
-
+#include <QTimer>
+//#include <QElapsedTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+//    QElapsedTimer t;
+//    t.start();
     readRegistery();
     if(isWindowMaximized)
         setWindowState(Qt::WindowMaximized);
@@ -31,8 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectSignals();
     setlocales();
-    setupModel();
-
+    QTimer::singleShot(100,this,&::MainWindow::setupModel);
+    //qDebug() << t.elapsed();
 }
 
 MainWindow::~MainWindow()
