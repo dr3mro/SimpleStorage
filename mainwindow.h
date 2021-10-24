@@ -96,6 +96,7 @@ private:
     void calculate();
     void resizeTableColumn();
     void readRegistery();
+    inline void tweakTableView();
 
 private slots:
     void AddNewItemToTable();

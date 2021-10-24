@@ -26,10 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     setMonths();
     updateDaysOfMonth();
     ResetDate();
-
-
     calculate();
     resizeTableColumn();
+
     connectSignals();
     setlocales();
     setupModel();
@@ -83,7 +82,6 @@ void MainWindow::Refresh()
 
 void MainWindow::Filter()
 {
-    //qDebug() << getFilterString();
     model->setFilter(getFilterString());
     calculate();
 }
@@ -102,13 +100,12 @@ void MainWindow::ToggleDelButton(const QModelIndex &index)
 
 void MainWindow::TranslateApp(int index)
 {
-
     const QString baseName = "SamarSimple_" + ilocales[index].Locale;
     if (translator.load(":/i18n/" + baseName)) {
-        //qDebug() << baseName;
-        //:/i18n/SamarSimple_ar_EG.ts
         qApp->installTranslator(&translator);
         ui->retranslateUi(this);
+
+        tweakTableView();
 
         if(ilocales[index].Lang != "عربي"){
             setLayoutDirection(Qt::LayoutDirection::LeftToRight);
@@ -116,6 +113,8 @@ void MainWindow::TranslateApp(int index)
             setLayoutDirection(Qt::LayoutDirection::RightToLeft);
         }
     }
+
+
 
 }
 
@@ -265,20 +264,8 @@ void MainWindow::setYears()
 void MainWindow::setupModel()
 {
     model->setTable("Sellings");
-    model->setHeaderData(0, Qt::Orientation::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Orientation::Horizontal, tr("Item"));
-    model->setHeaderData(2, Qt::Orientation::Horizontal, tr("Price"));
-    model->setHeaderData(3, Qt::Orientation::Horizontal, tr("Date Time"));
-    model->setEditStrategy(QSqlTableModel::OnRowChange);
-
     model->select();
-
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->setSelectionBehavior(QTableView::SelectionBehavior::SelectRows);
-    ui->tableView->setAlternatingRowColors(true);
-    ui->tableView->setModel(model);
-    ui->tableView->selectRow(0);
-    ui->tableView->hideColumn(0);
+    tweakTableView();
 }
 
 void MainWindow::setlocales()
@@ -317,4 +304,19 @@ void MainWindow::readRegistery()
     isWindowMaximized = reg->value(ISWINDOWMAXIMIZED).toBool();
 
     ui->searchByMonth->setChecked(searchMonth);
+}
+
+void MainWindow::tweakTableView()
+{
+    model->setHeaderData(0, Qt::Orientation::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Orientation::Horizontal, tr("Item"));
+    model->setHeaderData(2, Qt::Orientation::Horizontal, tr("Price"));
+    model->setHeaderData(3, Qt::Orientation::Horizontal, tr("Date Time"));
+    model->setEditStrategy(QSqlTableModel::OnRowChange);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->setSelectionBehavior(QTableView::SelectionBehavior::SelectRows);
+    ui->tableView->setAlternatingRowColors(true);
+    ui->tableView->setModel(model);
+    ui->tableView->selectRow(0);
+    ui->tableView->hideColumn(0);
 }
