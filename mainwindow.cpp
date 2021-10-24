@@ -127,6 +127,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
     resizeTableColumn();
+    calculate();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
