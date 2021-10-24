@@ -23,7 +23,8 @@ FORMS += \
     mainwindow.ui
 
 TRANSLATIONS += \
-    SamarSimple_en_US.ts
+    SamarSimple_en_US.ts \
+    SamarSimple_ar_EG.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -31,3 +32,9 @@ CONFIG += embed_translations
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    SamarSimple_ar_EG.ts
+
+RESOURCES += \
+    resources.qrc

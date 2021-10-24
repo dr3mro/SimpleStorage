@@ -15,25 +15,31 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    resize(800,600);
+    readRegistery();
+    if(isWindowMaximized)
+        setWindowState(Qt::WindowMaximized);
+    else
+        resize(initialWindowWidth,initialWindowHeight);
+
     setupDatabase();
     setYears();
     setMonths();
     updateDaysOfMonth();
     ResetDate();
     setupModel();
-    connectSignals();
+
     calculate();
     resizeTableColumn();
+    connectSignals();
+    setlocales();
+
 }
 
 MainWindow::~MainWindow()
 {
-    if(model->isDirty())
-        model->submitAll();
-
     delete model;
     delete query;
+    delete reg;
     delete ui;
 }
 
@@ -53,11 +59,16 @@ void MainWindow::AddNewItemToTable()
 
 void MainWindow::DelNewItemToTable()
 {
-    int reply = QMessageBox::question(this,"Caution!","Are you sure that you want to delete this record!",
-                                      QMessageBox::Yes,
-                                      QMessageBox::No);
+    QMessageBox messageBox(QMessageBox::Question,
+                           tr("Caution!"),
+                           tr("Are you sure that you want to delete this record!"),
+                           QMessageBox::Yes | QMessageBox::No,
+                           this);
+    messageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+    messageBox.setButtonText(QMessageBox::No, tr("No"));
 
-    if(reply == QMessageBox::Yes){
+
+    if(messageBox.exec() == QMessageBox::Yes){
         int row = ui->tableView->currentIndex().row();
         model->removeRow(row);
         model->select();
@@ -88,16 +99,51 @@ void MainWindow::ToggleDelButton(const QModelIndex &index)
     ui->del_button->setEnabled(index.isValid());
 }
 
+void MainWindow::TranslateApp(int index)
+{
+
+    const QString baseName = "SamarSimple_" + ilocales[index].Locale;
+    if (translator.load(":/i18n/" + baseName)) {
+        //qDebug() << baseName;
+        //:/i18n/SamarSimple_ar_EG.ts
+        qApp->installTranslator(&translator);
+        ui->retranslateUi(this);
+        if(ilocales[index].Lang != "عربي"){
+            setLayoutDirection(Qt::LayoutDirection::LeftToRight);
+        }else{
+            setLayoutDirection(Qt::LayoutDirection::RightToLeft);
+        }
+    }
+
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     resizeTableColumn();
-    QWidget::resizeEvent(event);
+    QMainWindow::resizeEvent(event);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-    QWidget::showEvent(event);
+    QMainWindow::showEvent(event);
     resizeTableColumn();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if(model->isDirty())
+        model->submitAll();
+
+    if(!this->isMaximized()){
+        reg->setValue(WINDOW_WIDTH,this->width());
+        reg->setValue(WINDOW_HEIGHT,this->height());
+    }
+    reg->setValue(SEARCH_MONTH,ui->searchByMonth->isChecked());
+    reg->setValue(CURRENT_LOCALE,ui->setLang->currentIndex());
+    reg->setValue(ISWINDOWMAXIMIZED,this->isMaximized());
+
+
+    QMainWindow::closeEvent(event);
 }
 
 QString MainWindow::getFilterString() const
@@ -140,6 +186,7 @@ void MainWindow::connectSignals()
     connect(model,&QSqlTableModel::primeInsert,this,&::MainWindow::resizeTableColumn);
     connect(ui->resetDate_button,&QPushButton::clicked,this,&::MainWindow::ResetDate);
     connect(ui->tableView,&QTableView::pressed,this,&::MainWindow::ToggleDelButton);
+    connect(ui->setLang,static_cast<void(QComboBox::*)(int)> (&QComboBox::currentIndexChanged),this,&::MainWindow::TranslateApp);
 }
 
 void MainWindow::setupDatabase()
@@ -168,7 +215,16 @@ void MainWindow::setupDatabase()
         }
         query->finish();
     }else{
-        QMessageBox::information(this,"Fatal Error","Failed to connect to database");
+        QMessageBox::information(this,tr("Fatal Error"),tr("Failed to connect to database"));
+
+        QMessageBox messageBox(QMessageBox::Information,
+                               tr("Fatal Error"),
+                               tr("Failed to connect to database"),
+                               QMessageBox::Ok , this);
+        messageBox.setButtonText(QMessageBox::Ok, tr("Ok"));
+
+        messageBox.exec();
+
         exit(1);
     }
 }
@@ -219,6 +275,15 @@ void MainWindow::setupModel()
     ui->tableView->hideColumn(0);
 }
 
+void MainWindow::setlocales()
+{
+
+    for(int i=0;i< sizeof(ilocales) / sizeof(ilocales[0]) ;i++){
+        ui->setLang->insertItem(i,ilocales[i].Lang);
+    }
+    ui->setLang->setCurrentIndex(currentLocale);
+}
+
 void MainWindow::calculate()
 {
     double sum = 0;
@@ -234,4 +299,16 @@ void MainWindow::resizeTableColumn()
     ui->tableView->setColumnWidth(1,ui->tableView->viewport()->width()-160);
     ui->tableView->setColumnWidth(2,40);
     ui->tableView->setColumnWidth(3,110);
+}
+
+void MainWindow::readRegistery()
+{
+    reg = new QSettings(regPath, QSettings::NativeFormat);
+    initialWindowWidth = reg->value(WINDOW_WIDTH).toInt();
+    initialWindowHeight = reg->value(WINDOW_HEIGHT).toInt();
+    searchMonth = reg->value(SEARCH_MONTH).toBool();
+    currentLocale = reg->value(CURRENT_LOCALE).toInt();
+    isWindowMaximized = reg->value(ISWINDOWMAXIMIZED).toBool();
+
+    ui->searchByMonth->setChecked(searchMonth);
 }
