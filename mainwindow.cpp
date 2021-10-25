@@ -56,8 +56,10 @@ void MainWindow::AddNewItemToTable()
 
     ui->tableView->setFocus(Qt::FocusReason::OtherFocusReason);
     ui->tableView->scrollToBottom();
-    ui->tableView->selectRow(rows);
 
+    ui->tableView->setCurrentIndex(model->index(rows, 1));
+    ui->new_button->setDisabled(!model->isDirty());
+//    ui->tableView->selectRow(rows);
 //    QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
 //    QModelIndex index = model->index(rows, 1);
 //    ui->tableView->selectionModel()->select(index,flags);
@@ -136,6 +138,7 @@ void MainWindow::showEvent(QShowEvent *event)
     QMainWindow::showEvent(event);
     resizeTableColumn();
     calculate();
+    ui->new_button->setFocus(Qt::FocusReason::OtherFocusReason);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -198,6 +201,11 @@ void MainWindow::connectSignals()
     connect(ui->setLang,static_cast<void(QComboBox::*)(int)> (&QComboBox::currentIndexChanged),this,&::MainWindow::TranslateApp);
     connect(ui->info_button,&QToolButton::clicked,this,[=](){
         QMessageBox::information(this,tr("About"),tr("This app is being developed by Dr. Amr Osman"));
+    });
+    connect(ui->tableView->itemDelegate(),&QAbstractItemDelegate::closeEditor,this,[=](){
+        ui->new_button->setEnabled(!model->isDirty() || ui->tableView->selectionModel()->currentIndex().column()==3);
+        model->submit();
+        ui->new_button->setFocus(Qt::FocusReason::OtherFocusReason);
     });
 }
 
