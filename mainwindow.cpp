@@ -178,7 +178,7 @@ QString MainWindow::getFilterString() const
                 .arg(nameFilterString,
                      year,
                      months[month].MonthNum,
-                     QString::number(day));
+                     QStringLiteral("%1").arg(day, 2, 10, QLatin1Char('0')));
     }
 }
 
@@ -256,7 +256,7 @@ void MainWindow::updateDaysOfMonth()
     int daysOfMonth = cal.daysInMonth(ui->month->currentIndex() + 1,ui->year->currentText().toInt());
 
     for(int i=1;i<=daysOfMonth;i++){
-        ui->day->addItem(QString::number(i));
+        ui->day->addItem(QStringLiteral("%1").arg(i, 2, 10, QLatin1Char('0')));
     }
 }
 

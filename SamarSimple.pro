@@ -5,6 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql
 RC_ICONS = appico.ico
 
 CONFIG += c++11
+QMAKE_CXXFLAGS_RELEASE += -DNDEBUG -Wall -O2
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
