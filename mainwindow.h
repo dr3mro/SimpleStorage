@@ -30,11 +30,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     typedef struct{
-        QString MonthName;
-        QString MonthNum;
-    }Month;
-
-    typedef struct{
         QString Lang;
         QString Locale;
     }iLocale;
@@ -64,23 +59,6 @@ private:
 
     QString getFilterString()const;
 
-
-
-
-    Month months[12] = {{"January","01"},
-                        {"February","02"},
-                        {"March","03"},
-                        {"April","04"},
-                        {"May","05"},
-                        {"June","06"},
-                        {"July","07"},
-                        {"August","08"},
-                        {"September","09"},
-                        {"October","10"},
-                        {"November","11"},
-                        {"December","12"}};
-
-
     iLocale ilocales[2] = {
         {"عربي","ar_EG"},
         {"English","en_US"}
@@ -88,9 +66,6 @@ private:
 
     void connectSignals();
     void setupDatabase();
-    void updateDaysOfMonth();
-    void setMonths();
-    void setYears();
     void setupModel();
     void setlocales();
     void calculate();
@@ -103,7 +78,6 @@ private slots:
     void DelNewItemToTable();
     void Refresh();
     void Filter();
-    void ResetDate();
     void ToggleDelButton(const QModelIndex &index);
     void TranslateApp(int index);
 

@@ -22,10 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
         resize(initialWindowWidth,initialWindowHeight);
 
     setupDatabase();
-    setYears();
-    setMonths();
-    updateDaysOfMonth();
-    ResetDate();
     calculate();
     resizeTableColumn();
 
@@ -59,10 +55,6 @@ void MainWindow::AddNewItemToTable()
 
     ui->tableView->setCurrentIndex(model->index(rows, 1));
     ui->new_button->setDisabled(!model->isDirty());
-//    ui->tableView->selectRow(rows);
-//    QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
-//    QModelIndex index = model->index(rows, 1);
-//    ui->tableView->selectionModel()->select(index,flags);
 }
 
 void MainWindow::DelNewItemToTable()
@@ -93,13 +85,7 @@ void MainWindow::Filter()
     model->setFilter(getFilterString());
     model->select();
     calculate();
-}
-
-void MainWindow::ResetDate()
-{
-    ui->day->setCurrentIndex(QDate::currentDate().day()-1);
-    ui->month->setCurrentIndex(QDate::currentDate().month()-1);
-    ui->year->setCurrentText(QString::number(QDate::currentDate().year()));
+    ui->new_button->setEnabled( !ui->searchByMonth->isChecked() && ui->calendarWidget->selectedDate() == QDate::currentDate());
 }
 
 void MainWindow::ToggleDelButton(const QModelIndex &index)
@@ -139,6 +125,7 @@ void MainWindow::showEvent(QShowEvent *event)
     resizeTableColumn();
     calculate();
     ui->new_button->setFocus(Qt::FocusReason::OtherFocusReason);
+    ui->calendarWidget->setSelectedDate(QDate::currentDate());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -161,24 +148,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
 QString MainWindow::getFilterString() const
 {
     QString filterName = ui->filter->text().simplified();
-    QString year = ui->year->currentText();
-    int month = ui->month->currentIndex();
-    int day = ui->day->currentIndex()+1;
+    int year  = ui->calendarWidget->selectedDate().year();
+    int month = ui->calendarWidget->selectedDate().month();
+    int day = ui->calendarWidget->selectedDate().day();
+
     QString nameFilterString = filterName.isEmpty()? "":QString("Name Like '%%1%' AND ").arg(filterName);
 
-    Q_ASSERT(!year.isEmpty());
-    Q_ASSERT(day > 0);
-    Q_ASSERT(month > 0 && month <=12);
-
     if(ui->searchByMonth->isChecked()){
-        return QString("%1 Timestamp BETWEEN '%2-%3-1 00:00:00' AND '%2-%4-1 23:59:59'")
-                .arg(nameFilterString,year,months[month].MonthNum,months[month+1].MonthNum);
+        return QString("%1 Timestamp BETWEEN '%2-%3-01 00:00:00' AND '%2-%4-01 00:00:00'")
+                .arg(nameFilterString,
+                     QString::number(month < 12 ? year:year+1),
+                     QString("%1").arg(ui->calendarWidget->selectedDate().month(),2,10,QChar('0')),
+                     QString("%1").arg(ui->calendarWidget->selectedDate().addMonths(1).month(),2,10,QChar('0')));
     }else{
         return QString("%1 Timestamp BETWEEN '%2-%3-%4 00:00:00' AND '%2-%3-%4 23:59:59'")
                 .arg(nameFilterString,
-                     year,
-                     months[month].MonthNum,
-                     QStringLiteral("%1").arg(day, 2, 10, QLatin1Char('0')));
+                     QString::number(year),
+                     QString("%1").arg(month,2,10,QChar('0')),
+                     QString("%1").arg(day,2,10,QChar('0')));
     }
 }
 
@@ -188,15 +175,14 @@ void MainWindow::connectSignals()
     connect(ui->del_button,&QPushButton::clicked,this,&::MainWindow::DelNewItemToTable);
     connect(ui->refresh_button,&QPushButton::clicked,this,&::MainWindow::Refresh);
     connect(ui->filter,&QLineEdit::textChanged,this,&::MainWindow::Filter);
-    connect(ui->day,&QComboBox::currentTextChanged,this,&::MainWindow::Filter);
-    connect(ui->month,&QComboBox::currentTextChanged,this,&::MainWindow::Filter);
-    connect(ui->year,&QComboBox::currentTextChanged,this,&::MainWindow::Filter);
     connect(ui->searchByMonth,&Switch::clicked,this,&::MainWindow::Filter);
     connect(model,&QSqlTableModel::dataChanged,this,&::MainWindow::calculate);
     connect(model,&QSqlTableModel::primeInsert,this,&::MainWindow::calculate);
     connect(model,&QSqlTableModel::dataChanged,this,&::MainWindow::resizeTableColumn);
     connect(model,&QSqlTableModel::primeInsert,this,&::MainWindow::resizeTableColumn);
-    connect(ui->resetDate_button,&QPushButton::clicked,this,&::MainWindow::ResetDate);
+    connect(ui->resetDate_button,&QPushButton::clicked,this,[=](){
+        ui->calendarWidget->setSelectedDate(QDate::currentDate());
+    });
     connect(ui->tableView,&QTableView::pressed,this,&::MainWindow::ToggleDelButton);
     connect(ui->setLang,static_cast<void(QComboBox::*)(int)> (&QComboBox::currentIndexChanged),this,&::MainWindow::TranslateApp);
     connect(ui->info_button,&QToolButton::clicked,this,[=](){
@@ -206,6 +192,11 @@ void MainWindow::connectSignals()
         ui->new_button->setEnabled(!model->isDirty() || ui->tableView->selectionModel()->currentIndex().column()==3);
         model->submit();
         ui->new_button->setFocus(Qt::FocusReason::OtherFocusReason);
+    });
+
+    connect(ui->calendarWidget,&QCalendarWidget::selectionChanged,this,&::MainWindow::Filter);
+    connect(ui->calendarWidget,&QCalendarWidget::selectionChanged,[=](){
+        ui->searchByMonth->setChecked(false);
     });
 }
 
@@ -246,33 +237,6 @@ void MainWindow::setupDatabase()
         messageBox.exec();
 
         exit(1);
-    }
-}
-
-void MainWindow::updateDaysOfMonth()
-{
-    ui->day->clear();
-    QCalendar cal;
-    int daysOfMonth = cal.daysInMonth(ui->month->currentIndex() + 1,ui->year->currentText().toInt());
-
-    for(int i=1;i<=daysOfMonth;i++){
-        ui->day->addItem(QStringLiteral("%1").arg(i, 2, 10, QLatin1Char('0')));
-    }
-}
-
-void MainWindow::setMonths()
-{
-    for(int i=0;i<12;i++){
-        ui->month->insertItem(i,months[i].MonthName);
-    }
-}
-
-void MainWindow::setYears()
-{
-    int startYear = QDate::currentDate().year();
-
-    for(int i = startYear-6,j=0; i <= startYear ; i++,j++){
-        ui->year->insertItem(j,QString::number(i));
     }
 }
 
