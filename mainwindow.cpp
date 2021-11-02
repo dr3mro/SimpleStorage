@@ -47,15 +47,15 @@ void MainWindow::AddNewItemToTable()
     record.setValue("Timestamp",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss" ));
 
     model->insertRecord(rows-1,record);
-    //model->select();
 
     if(ui->addToDate->isChecked() && ui->calendarWidget->selectedDate() != QDate::currentDate()){
         query->exec(QString("UPDATE Sellings SET Timestamp='%1' WHERE Timestamp='%2';")
-                    .arg(QString("%1 %2").arg(
-                             QString("%1 %2").arg(ui->calendarWidget->selectedDate().toString("yyyy-MM-dd"),
-                                            QTime::currentTime().toString("hh:mm:ss"))),
-                                            record.value("Timestamp").toString()));
-        //model->select();
+                    .arg(
+         QString("%1 %2").arg(
+                                ui->calendarWidget->selectedDate().toString("yyyy-MM-dd"),
+                                QTime::currentTime().toString("hh:mm:ss"))
+
+        ,record.value("Timestamp").toString()));
     }
     model->select();
     ui->tableView->setFocus(Qt::FocusReason::OtherFocusReason);
@@ -101,8 +101,7 @@ void MainWindow::Filter()
     calculate();
     ui->new_button->setEnabled(
                 ui->addToDate->isChecked()
-             || (!ui->searchByMonth->isChecked()
-             && ui->calendarWidget->selectedDate() == QDate::currentDate()));
+             || ui->calendarWidget->selectedDate() == QDate::currentDate());
 }
 
 void MainWindow::ToggleDelButton(const QModelIndex &index)
@@ -121,8 +120,10 @@ void MainWindow::TranslateApp(int index)
 
         if(ilocales[index].Lang != "عربي"){
             setLayoutDirection(Qt::LayoutDirection::LeftToRight);
+            ui->calendarWidget->setLocale(QLocale(QLocale::English,QLocale::UnitedStates));
         }else{
             setLayoutDirection(Qt::LayoutDirection::RightToLeft);
+            ui->calendarWidget->setLocale(QLocale(QLocale::Arabic,QLocale::Egypt));
         }
     }
 
@@ -213,9 +214,6 @@ void MainWindow::connectSignals()
     });
 
     connect(ui->calendarWidget,&QCalendarWidget::selectionChanged,this,&::MainWindow::Filter);
-    connect(ui->calendarWidget,&QCalendarWidget::selectionChanged,[=](){
-        ui->searchByMonth->setChecked(false);
-    });
 }
 
 void MainWindow::setupDatabase()
