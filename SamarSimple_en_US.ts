@@ -111,6 +111,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="282"/>
+        <source>LE</source>
+        <oldsource>%1 LE</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="mainwindow.cpp" line="306"/>
         <source>ID</source>
         <translation type="unfinished"></translation>

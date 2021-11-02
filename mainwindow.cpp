@@ -126,9 +126,7 @@ void MainWindow::TranslateApp(int index)
             ui->calendarWidget->setLocale(QLocale(QLocale::Arabic,QLocale::Egypt));
         }
     }
-
-
-
+    calculate();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -279,7 +277,7 @@ void MainWindow::calculate()
     for(int i = 0 ;i < rows; i++ ){
         sum += model->index(i,2).data().toDouble();
     }
-    ui->sum->setText(QString("%1 LE").arg(sum));
+    ui->sum->setText(QString::number(sum));
 }
 
 void MainWindow::resizeTableColumn()
