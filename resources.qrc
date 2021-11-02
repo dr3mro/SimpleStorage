@@ -3,4 +3,5 @@
         <file>SamarSimple_ar_EG.ts</file>
         <file>SamarSimple_en_US.ts</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

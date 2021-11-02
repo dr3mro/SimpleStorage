@@ -9,7 +9,6 @@
 #include <QTableView>
 #include <QCalendar>
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -29,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     setlocales();
     setupModel();
     Filter();
-
 }
 
 MainWindow::~MainWindow()
@@ -47,14 +45,28 @@ void MainWindow::AddNewItemToTable()
     record.setValue("Item","");
     record.setValue("SellPrice",double(0));
     record.setValue("Timestamp",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss" ));
-    model->insertRecord(rows-1,record);
-    model->select();
 
+    model->insertRecord(rows-1,record);
+    //model->select();
+
+    if(ui->addToDate->isChecked() && ui->calendarWidget->selectedDate() != QDate::currentDate()){
+        query->exec(QString("UPDATE Sellings SET Timestamp='%1' WHERE Timestamp='%2';")
+                    .arg(QString("%1 %2").arg(
+                             QString("%1 %2").arg(ui->calendarWidget->selectedDate().toString("yyyy-MM-dd"),
+                                            QTime::currentTime().toString("hh:mm:ss"))),
+                                            record.value("Timestamp").toString()));
+        //model->select();
+    }
+    model->select();
     ui->tableView->setFocus(Qt::FocusReason::OtherFocusReason);
     ui->tableView->scrollToBottom();
 
     ui->tableView->setCurrentIndex(model->index(rows, 1));
     ui->new_button->setDisabled(!model->isDirty());
+
+
+
+
 }
 
 void MainWindow::DelNewItemToTable()
@@ -72,7 +84,9 @@ void MainWindow::DelNewItemToTable()
         int row = ui->tableView->currentIndex().row();
         model->removeRow(row);
         model->select();
+        ui->del_button->setEnabled(false);
     }
+
 }
 
 void MainWindow::Refresh()
@@ -85,7 +99,10 @@ void MainWindow::Filter()
     model->setFilter(getFilterString());
     model->select();
     calculate();
-    ui->new_button->setEnabled( !ui->searchByMonth->isChecked() && ui->calendarWidget->selectedDate() == QDate::currentDate());
+    ui->new_button->setEnabled(
+                ui->addToDate->isChecked()
+             || (!ui->searchByMonth->isChecked()
+             && ui->calendarWidget->selectedDate() == QDate::currentDate()));
 }
 
 void MainWindow::ToggleDelButton(const QModelIndex &index)
@@ -176,6 +193,7 @@ void MainWindow::connectSignals()
     connect(ui->refresh_button,&QPushButton::clicked,this,&::MainWindow::Refresh);
     connect(ui->filter,&QLineEdit::textChanged,this,&::MainWindow::Filter);
     connect(ui->searchByMonth,&Switch::clicked,this,&::MainWindow::Filter);
+    connect(ui->addToDate,&Switch::clicked,this,&::MainWindow::Filter);
     connect(model,&QSqlTableModel::dataChanged,this,&::MainWindow::calculate);
     connect(model,&QSqlTableModel::primeInsert,this,&::MainWindow::calculate);
     connect(model,&QSqlTableModel::dataChanged,this,&::MainWindow::resizeTableColumn);
@@ -268,7 +286,7 @@ void MainWindow::calculate()
 
 void MainWindow::resizeTableColumn()
 {
-    ui->tableView->setColumnWidth(1,ui->tableView->viewport()->width()-160);
+    ui->tableView->setColumnWidth(1,ui->tableView->viewport()->width()-180);
     ui->tableView->setColumnWidth(2,40);
     ui->tableView->setColumnWidth(3,110);
 }
