@@ -171,8 +171,9 @@ QString MainWindow::getFilterString() const
     QString nameFilterString = filterName.isEmpty()? "":QString("Name Like '%%1%' AND ").arg(filterName);
 
     if(ui->searchByMonth->isChecked()){
-        return QString("%1 Timestamp BETWEEN '%2-%3-01 00:00:00' AND '%2-%4-01 00:00:00'")
+        return QString("%1 Timestamp BETWEEN '%2-%4-01 00:00:00' AND '%3-%5-01 00:00:00'")
                 .arg(nameFilterString,
+                     QString::number(year),
                      QString::number(month < 12 ? year:year+1),
                      QString("%1").arg(ui->calendarWidget->selectedDate().month(),2,10,QChar('0')),
                      QString("%1").arg(ui->calendarWidget->selectedDate().addMonths(1).month(),2,10,QChar('0')));
