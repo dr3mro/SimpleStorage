@@ -49,13 +49,23 @@ void MainWindow::AddNewItemToTable()
     model->insertRecord(rows-1,record);
 
     if(ui->addToDate->isChecked() && ui->calendarWidget->selectedDate() != QDate::currentDate()){
-        query->exec(QString("UPDATE Sellings SET Timestamp='%1' WHERE Timestamp='%2';")
-                    .arg(
-         QString("%1 %2").arg(
-                                ui->calendarWidget->selectedDate().toString("yyyy-MM-dd"),
-                                QTime::currentTime().toString("hh:mm:ss"))
+        int id = -1;
+        query->clear();
+        bool x = query->exec("SELECT MAX(id) FROM Sellings");
+        while (query->next()) {
 
-        ,record.value("Timestamp").toString()));
+            id = query->value(0).toInt();
+        }
+        query->finish();
+        if (id > 0 && x){
+            query->clear();
+            QString timestamp = QString("%1 %2").arg(ui->calendarWidget->selectedDate().toString("yyyy-MM-dd"),QTime::currentTime().toString("hh:mm:ss"));
+            QString qText = QString("UPDATE Sellings SET Timestamp='%1' WHERE id='%2';").arg(timestamp,QString::number(id));
+            query->exec(qText);
+            query->finish();
+        }else{
+            QMessageBox::information(this,tr("Error"),tr("Error 7"));
+        }
     }
     model->select();
     ui->tableView->setFocus(Qt::FocusReason::OtherFocusReason);
