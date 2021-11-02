@@ -282,9 +282,9 @@ void MainWindow::calculate()
 
 void MainWindow::resizeTableColumn()
 {
-    ui->tableView->setColumnWidth(1,ui->tableView->viewport()->width()-180);
-    ui->tableView->setColumnWidth(2,40);
-    ui->tableView->setColumnWidth(3,110);
+    ui->tableView->setColumnWidth(1,ui->tableView->viewport()->width()*0.66);
+    ui->tableView->setColumnWidth(2,ui->tableView->viewport()->width()*0.10);
+    ui->tableView->setColumnWidth(3,ui->tableView->viewport()->width()*0.24);
 }
 
 void MainWindow::readRegistery()
