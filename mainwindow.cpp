@@ -14,20 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    readRegistery();
-    if(isWindowMaximized)
-        setWindowState(Qt::WindowMaximized);
-    else
-        resize(initialWindowWidth,initialWindowHeight);
-
-    setupDatabase();
-    calculate();
-    resizeTableColumn();
-
-    connectSignals();
-    setlocales();
-    setupModel();
-    Filter();
 }
 
 MainWindow::~MainWindow()
@@ -148,10 +134,22 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
-    resizeTableColumn();
-    calculate();
+    readRegistery();
+    if(isWindowMaximized)
+        setWindowState(Qt::WindowMaximized);
+    else
+        resize(initialWindowWidth,initialWindowHeight);
     ui->new_button->setFocus(Qt::FocusReason::OtherFocusReason);
     ui->calendarWidget->setSelectedDate(QDate::currentDate());
+
+    qApp->processEvents();
+    setupDatabase();
+    connectSignals();
+    setlocales();
+    setupModel();
+    Filter();
+    resizeTableColumn();
+    calculate();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
